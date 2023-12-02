@@ -18,17 +18,22 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = GCN(num_node_features=NUM_NODE_FEATURES, embedding_size=EMBEDDING_SIZE, hidden_layers=HIDDEN_LAYERS).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
+print(f'Graph dir: {config_["graph_dir"]}')
+
 graph_data_list = []
 graph_names = []
-for files in glob.glob(f'{config_["graph_dir"]}/*')[0:1000]:
-    graph_data_list.append(pickle.load(open(files, 'rb')).to(device))
+for files in glob.glob(f'{config_["graph_dir"]}/*.pkl'):
+    graph_data_list.append(pickle.load(open(files, 'rb')))
     graph_names.append(files.split('/')[-1].replace('pkl', ''))
 
 for epoch in range(NUM_EPOCHS):
     total_loss = 0
     for i, items in enumerate(graph_data_list):
-        print(f'Training {graph_names[i]}')
+        # print(f'Training {graph_names[i]}')
         graph_data = items.to(device)
+        graph_data.x = graph_data.x.float()
+        graph_data.edge_index = graph_data.edge_index.int()
+
         model.train()
         optimizer.zero_grad()
 

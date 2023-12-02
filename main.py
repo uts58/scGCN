@@ -1,9 +1,13 @@
 import pickle
 
 import networkx as nx
+import pandas as pd
 from torch_geometric.utils import from_networkx
 
 from config import *
+
+chr_gene_mapping = create_chr_gene_mapping()
+print('Chromosome vs Gene mapping calculated')
 
 df_rna_umicount = [pd.read_csv(rna_file, sep='\t') for rna_file in config_['rna_umicount_list']]
 print('umicount files loaded')

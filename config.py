@@ -81,10 +81,6 @@ def create_chr_gene_mapping() -> dict:
     return data_
 
 
-chr_gene_mapping = create_chr_gene_mapping()
-print('Chromosome vs Gene mapping calculated')
-
-
 def get_data_files():
     cell_vs_files = {}
 
