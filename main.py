@@ -1,7 +1,6 @@
-import pickle
-
 import networkx as nx
 import pandas as pd
+import pickle
 from torch_geometric.utils import from_networkx
 
 from config import *
@@ -79,7 +78,7 @@ def construct_final_graph(common_g, file_base_name_: str, resolution=resolution)
                           names=['readID', 'chr1', 'pos1', 'chr2', 'pos2', 'strand1', 'strand2', 'phase0', 'phase1'])
     df_data = df_data[['chr1', 'pos1', 'chr2', 'pos2']]
     df_data = df_data.loc[
-        (df_data['chr1'].isin(config_['chrom_list'])) & (df_data['chr1'].isin(config_['chrom_list']))].copy()
+        (df_data['chr1'].isin(config_['chrom_list'])) & (df_data['chr2'].isin(config_['chrom_list']))].copy()
 
     edge_list = [(f"{row[0]}_{row[1] // resolution}",
                   f"{row[2]}_{row[3] // resolution}")
