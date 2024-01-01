@@ -8,7 +8,7 @@ from sklearn.metrics import adjusted_rand_score
 
 from config import load_graph_data, config_
 
-true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()
+true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -29,6 +29,9 @@ with torch.no_grad():
 print(f'Preparing Data for Clustering')
 embeddings_array = np.array(list(graph_embeddings.values()))
 graph_names = list(graph_embeddings.keys())
+for items in true_cluster_dict.copy():
+    if items not in graph_names:
+        true_cluster_dict.pop(items)
 
 print('Performing KMeans Clustering')
 kmeans = KMeans(n_clusters=28, random_state=1)

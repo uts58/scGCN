@@ -102,7 +102,7 @@ def load_graph_data():
     for files in glob.glob(f'{config_["graph_dir"]}/*.pkl'):
         graph_data = pickle.load(open(files, 'rb'))
         graph_data.x, graph_data.edge_index = graph_data.x.float(), graph_data.edge_index.long()
-        name = files.split('/')[-1].replace('pkl', '')
+        name = files.split('/')[-1].replace('.pkl', '')
         graph_list[name] = graph_data
 
     return graph_list

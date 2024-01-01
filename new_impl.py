@@ -4,7 +4,7 @@ from sklearn.cluster import KMeans
 from torch.utils.data import DataLoader
 
 from config import load_graph_data, chunk_graphs
-from new_model import GVAE
+from new_model import GVAE, loss_function
 
 #########################################################
 NUM_EPOCHS = 50
@@ -23,13 +23,20 @@ if torch.cuda.device_count() > 1:
     model = torch.nn.DataParallel(model)
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-graph_list, graph_names = load_graph_data()
+graph_list = load_graph_data()
 
 data_loader = DataLoader(chunk_graphs(graph_list, BATCH_SIZE), shuffle=True)
 
 #########################################################
-for batch in data_loader:
-
+for epoch in range(NUM_EPOCHS):
+    for graph in graph_list:
+        x, edge_index = graph.x, graph.edge_index
+        model.train()
+        optimizer.zero_grad()
+        recon_graph, mu, logstd = model(x, edge_index)
+        loss = loss_function(recon_graph, x, mu, logstd)
+        loss.backward()
+        optimizer.step()
 
 #########################################################
 graph_embeddings = []
@@ -41,6 +48,7 @@ for graph in graph_list:
         graph_embeddings.append(graph_embedding.numpy())
 
 graph_embeddings = np.stack(graph_embeddings)
+# graph_embeddings = np.vstack(graph_embeddings)
 kmeans = KMeans(n_clusters=NUM_CLUSTERS)
 clusters = kmeans.fit_predict(graph_embeddings)
 #########################################################
