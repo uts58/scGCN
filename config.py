@@ -1,10 +1,14 @@
 import glob
 import os
+import pickle
+from collections import OrderedDict
 
 import pandas as pd
+from torch_geometric.data import Batch
 
 config_ = {
     'config_name': 'uts et. al',
+    'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/",
     'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/',
     'chrom_list': [
@@ -12,7 +16,7 @@ config_ = {
         'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
         'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
         'chr16', 'chr17', 'chr18', 'chr19',
-        # 'chr20', 'chr21', 'chr22',  #house mouse doesn't have these
+        # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
         'chrX'
     ],
     'rna_umicount_list': [
@@ -21,6 +25,7 @@ config_ = {
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
+    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels.csv",
     'resolution': 50000
 }
 
@@ -90,3 +95,23 @@ def get_data_files():
         cell_vs_files[cell_name] = file_name
 
     return cell_vs_files
+
+
+def load_graph_data():
+    graph_list = OrderedDict()
+    for files in glob.glob(f'{config_["graph_dir"]}/*.pkl'):
+        graph_data = pickle.load(open(files, 'rb'))
+        graph_data.x, graph_data.edge_index = graph_data.x.float(), graph_data.edge_index.long()
+        name = files.split('/')[-1].replace('pkl', '')
+        graph_list[name] = graph_data
+
+    return graph_list
+
+
+def chunk_graphs(graph_list, batch_size):
+    """Chunks a list of graphs into batches of specified size."""
+
+    for i in range(0, len(graph_list), batch_size):
+        batch = graph_list[i:i + batch_size]
+        batch = Batch.from_data_list(batch)  # Combine into a Batch object
+        yield batch
