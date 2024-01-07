@@ -26,12 +26,23 @@ with torch.no_grad():
         graph_embeddings[key] = graph_embedding.cpu().numpy()
         graph_data.to('cpu')
 
+print(len(graph_embeddings), len(true_cluster_dict))
+
+keys_to_remove = [key for key in true_cluster_dict if key not in graph_embeddings.keys()]
+print(f'Removing {keys_to_remove}')
+for key in keys_to_remove:
+    true_cluster_dict.pop(key)
+
+keys_to_remove = [key for key in graph_embeddings.keys() if key not in true_cluster_dict]
+print(f'Removing {keys_to_remove}')
+for key in keys_to_remove:
+    graph_embeddings.pop(key)
+
 print(f'Preparing Data for Clustering')
 embeddings_array = np.array(list(graph_embeddings.values()))
 graph_names = list(graph_embeddings.keys())
-for items in true_cluster_dict.copy():
-    if items not in graph_names:
-        true_cluster_dict.pop(items)
+print(len(graph_embeddings), len(true_cluster_dict))
+
 
 print('Performing KMeans Clustering')
 kmeans = KMeans(n_clusters=28, random_state=1)
