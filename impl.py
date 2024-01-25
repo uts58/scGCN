@@ -3,20 +3,19 @@ import torch
 from config import config_, load_graph_data
 from models import GCN
 
+##########################################################
 EMBEDDING_SIZE = 10
 NUM_EPOCHS = 50
 HIDDEN_LAYERS = 16
 NUM_NODE_FEATURES = 1  # actually data.num_node_features
+##########################################################
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 model = GCN(num_node_features=NUM_NODE_FEATURES, embedding_size=EMBEDDING_SIZE, hidden_layers=HIDDEN_LAYERS)
 model.to(device)
-# model = torch.nn.DataParallel(model, device_ids=[0, 1, 2, 3])
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 print(f'Graph dir: {config_["graph_dir"]}')
-
 graph_list = load_graph_data()
 
 for epoch in range(NUM_EPOCHS):
