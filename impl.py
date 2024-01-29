@@ -4,9 +4,9 @@ from config import config_, load_graph_data
 from models import GCN
 
 ##########################################################
-EMBEDDING_SIZE = 10
+EMBEDDING_SIZE = 128
 NUM_EPOCHS = 50
-HIDDEN_LAYERS = 16
+HIDDEN_LAYERS = 256
 NUM_NODE_FEATURES = 1  # actually data.num_node_features
 ##########################################################
 
@@ -21,7 +21,7 @@ graph_list = load_graph_data()
 for epoch in range(NUM_EPOCHS):
     total_loss = 0
     for key, value in graph_list.items():
-        print(f'Training {key}')
+        # print(f'Training {key}')
         graph_data = value.to(device)
 
         model.train()
@@ -31,7 +31,8 @@ for epoch in range(NUM_EPOCHS):
         embeddings = model.forward(graph_data)
 
         # Reconstruction loss: MSE between input features and embeddings
-        loss = torch.mean((embeddings - graph_data.x) ** 2)
+        # loss = torch.mean((embeddings - graph_data.x) ** 2)
+        loss = torch.var(embeddings)
         total_loss += loss.item()
 
         # Backward pass
@@ -43,4 +44,4 @@ for epoch in range(NUM_EPOCHS):
     print(f'Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
 
 print('Training done')
-torch.save(model, f'{config_["parent_dir"]}/model.pt')
+torch.save(model, f'{config_["parent_dir"]}/brain_model.pt')

@@ -10,7 +10,7 @@ config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/",
-    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/',
+    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain',
     'chrom_list': [
         'chr1', 'chr2', 'chr3', 'chr4', 'chr5',
         'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
@@ -25,7 +25,7 @@ config_ = {
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
-    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels.csv",
+    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels_brain.csv",
     'resolution': 50000
 }
 
