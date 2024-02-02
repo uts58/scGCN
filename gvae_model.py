@@ -11,6 +11,13 @@ class GVAE(nn.Module):
         self.gc2_mean = GCNConv(hidden_dim, latent_dim)
         self.gc2_logstd = GCNConv(hidden_dim, latent_dim)
 
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, in_features),
+            nn.Sigmoid()  # Use sigmoid to get values between 0 and 1
+        )
+
     def encode(self, x, edge_index):
         hidden = F.relu(self.gc1(x, edge_index))
         return self.gc2_mean(hidden, edge_index), self.gc2_logstd(hidden, edge_index)
@@ -21,9 +28,8 @@ class GVAE(nn.Module):
         return mu + eps * std
 
     def decode(self, z):
-        # Implement the decoder depending on your graph reconstruction needs
-        # Typically it involves reconstructing the adjacency matrix
-        pass
+        reconstructed_adj = self.decoder(z)
+        return reconstructed_adj
 
     def forward(self, x, edge_index):
         mu, logstd = self.encode(x, edge_index)

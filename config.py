@@ -97,15 +97,15 @@ def get_data_files():
     return cell_vs_files
 
 
-def load_graph_data():
-    graph_list = OrderedDict()
+def load_graph_data() -> dict:
+    graph_dict = OrderedDict()
     for files in glob.glob(f'{config_["graph_dir"]}/*.pkl'):
         graph_data = pickle.load(open(files, 'rb'))
         graph_data.x, graph_data.edge_index = graph_data.x.float(), graph_data.edge_index.long()
         name = files.split('/')[-1].replace('.pkl', '')
-        graph_list[name] = graph_data
+        graph_dict[name] = graph_data
 
-    return graph_list
+    return graph_dict
 
 
 def chunk_graphs(graph_list, batch_size):
