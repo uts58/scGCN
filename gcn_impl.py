@@ -36,5 +36,5 @@ for epoch in range(NUM_EPOCHS):
 
     print(f'Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
     if epoch % 100 == 0 and epoch != 0:
-        torch.save(model, f'{config_["parent_dir"]}/GCN_brain_model_{epoch}.pt')
+        torch.save(model, f'{config_["parent_dir"]}/GCN_brain_chr1_model_{epoch}.pt')
         print(f'{epoch} saved')

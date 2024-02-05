@@ -8,24 +8,26 @@ from config import load_graph_data, config_
 # true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = torch.load(f'{config_["parent_dir"]}/GVAE_brain_model_100.pt')
+model = torch.load(f'{config_["parent_dir"]}/GCN_brain_chr1_model_100.pt')
 model.eval()
 
 graph_list = load_graph_data()
 
+print("Extracting embeddings")
 graph_embeddings = {}
 
 with torch.no_grad():
     for key, value in graph_list.items():
         graph_data = value.to(device)
         #FOR GCN
-        # node_embeddings = model(graph_data)  # Get the embedding for the graph
+        node_embeddings = model(graph_data)  # Get the embedding for the graph
+        graph_embedding = node_embeddings.sum(dim=0)
         ###################
         #FOR GVAE
-        x, edge_index = graph_data.x, graph_data.edge_index
-        node_embeddings = model(x, edge_index)
+        # x, edge_index = graph_data.x, graph_data.edge_index
+        # recon_graph, mu, logstd = model(x, edge_index)
+        # graph_embedding = mu.sum(dim=0)
         ###################
-        graph_embedding = node_embeddings.sum(dim=0)
         graph_embeddings[key] = graph_embedding.cpu().numpy()
         graph_data.to('cpu')
 
