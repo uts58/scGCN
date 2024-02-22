@@ -5,7 +5,7 @@ from gcn_model import GCN
 
 ##########################################################
 EMBEDDING_SIZE = 256
-NUM_EPOCHS = 10000
+NUM_EPOCHS = 500
 HIDDEN_LAYERS = 512
 NUM_NODE_FEATURES = 1  # actually data.num_node_features
 LEARNING_RATE = 0.001

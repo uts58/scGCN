@@ -8,7 +8,7 @@ from config import load_graph_data, config_
 # true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = torch.load(f'{config_["parent_dir"]}/GCN_brain_chr1_model_100.pt')
+model = torch.load(f'{config_["parent_dir"]}/GCN_brain_without_common_graph_model_chr1_100.pt')
 model.eval()
 
 graph_list = load_graph_data()
@@ -31,7 +31,8 @@ with torch.no_grad():
         graph_embeddings[key] = graph_embedding.cpu().numpy()
         graph_data.to('cpu')
 
-reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2)
+# reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2)
+reducer = umap.UMAP()
 embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
 kmeans = KMeans(n_clusters=7)  # Set the number of clusters
@@ -55,5 +56,5 @@ plt.colorbar(scatter)
 plt.title('Graph Embeddings clustered with UMAP')
 plt.xlabel('UMAP 1')
 plt.ylabel('UMAP 2')
-plt.savefig('plot_gvae.png')
+plt.savefig('plot.png')
 print('Plotting done')

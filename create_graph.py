@@ -3,7 +3,7 @@ import pickle
 import networkx as nx
 from torch_geometric.utils import from_networkx
 
-from config import *
+from config_temp import *
 
 chr_gene_mapping = create_chr_gene_mapping()
 print('Chromosome vs Gene mapping calculated')
