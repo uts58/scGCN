@@ -46,7 +46,7 @@ def create_common_graph(file_base_name_: str, cell_name_: str, resolution=resolu
     chrom_sizes_ = chrom_sizes_.loc[chrom_sizes_['chrom_name'].isin(config_['chrom_list'])].copy()
 
     nodes_with_attributes = []
-    edge_list = []
+    # edge_list = []
 
     gene_umicount = get_gene_umicount(cell_name_)
 
@@ -62,12 +62,12 @@ def create_common_graph(file_base_name_: str, cell_name_: str, resolution=resolu
                     (f"{chrom_name}_{bins}", {'x': 0})
                 )
 
-        edges = [(f"{chrom_name}_{i}", f"{chrom_name}_{i + 1}") for i in range(chr_bin)]
-        edge_list.extend(edges)
+        # edges = [(f"{chrom_name}_{i}", f"{chrom_name}_{i + 1}") for i in range(chr_bin)]
+        # edge_list.extend(edges)
 
     g = nx.Graph()
     g.add_nodes_from(nodes_with_attributes)
-    g.add_edges_from(edge_list)
+    # g.add_edges_from(edge_list)
 
     return g
 

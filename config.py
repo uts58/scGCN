@@ -10,7 +10,7 @@ config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/brain/",
-    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_chr1/',
+    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph_chr1/',
     'chrom_list': [
         'chr1',
         # 'chr2', 'chr3', 'chr4', 'chr5',
@@ -18,7 +18,7 @@ config_ = {
         # 'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
         # 'chr16', 'chr17', 'chr18', 'chr19',
         # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-        # 'chrX'
+        'chrX'
     ],
     'rna_umicount_list': [
         "/mmfs1/scratch/utsha.saha/mouse_data/data/rna/GSE223917_HiRES_brain.rna.umicount.tsv",
