@@ -4,9 +4,9 @@ from config import config_, load_graph_data
 from gcn_model import GCN
 
 ##########################################################
-EMBEDDING_SIZE = 256
+EMBEDDING_SIZE = 512
 NUM_EPOCHS = 500
-HIDDEN_LAYERS = 512
+HIDDEN_LAYERS = 1024
 NUM_NODE_FEATURES = 1  # actually data.num_node_features
 LEARNING_RATE = 0.001
 ##########################################################
