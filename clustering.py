@@ -8,7 +8,7 @@ from config import load_graph_data, config_
 # true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = torch.load(f'{config_["parent_dir"]}/GCN_brain_without_common_graph_model_chr1_100.pt')
+model = torch.load(f'{config_["parent_dir"]}/deep_model100.pt')
 model.eval()
 
 graph_list = load_graph_data()
