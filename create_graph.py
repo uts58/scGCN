@@ -1,5 +1,3 @@
-import pickle
-
 import networkx as nx
 from torch_geometric.utils import from_networkx
 
@@ -88,21 +86,36 @@ def construct_final_graph(common_g, file_base_name_: str, resolution=resolution)
     return common_g
 
 
-for items in cell_vs_files:
-    file_base_name = cell_vs_files[items]
-    cell_name = items
+asd = [
+    'chr1',
+    'chr2', 'chr3', 'chr4', 'chr5',
+    'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
+    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
+    'chr16', 'chr17', 'chr18', 'chr19',
+    # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
+    'chrX'
+]
+for a in asd:
+    print(f'Starting {a}')
+    config_['chrom_list'] = [a]
+    dir_ = f'{config_["graph_dir"]}_{a}'
+    os.makedirs(dir_, exist_ok=True)
+    for items in cell_vs_files:
+        file_base_name = cell_vs_files[items]
+        cell_name = items
 
-    common_graph = create_common_graph(file_base_name, cell_name)
-    print(
-        f'Common_graph: {file_base_name}: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}')
+        common_graph = create_common_graph(file_base_name, cell_name)
+        print(
+            f'Common_graph: {file_base_name}: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}')
 
-    final_graph = construct_final_graph(common_graph, file_base_name)
-    print(
-        f'Final_graph: {file_base_name}: Number of edges:{final_graph.number_of_edges()}, number of nodes:{final_graph.number_of_nodes()}')
+        final_graph = construct_final_graph(common_graph, file_base_name)
+        print(
+            f'Final_graph: {file_base_name}: Number of edges:{final_graph.number_of_edges()}, number of nodes:{final_graph.number_of_nodes()}')
 
-    try:
-        data = from_networkx(final_graph)
-        data.x = data.x.view(-1, 1)
-        pickle.dump(data, open(f'{config_["graph_dir"]}/{cell_name}.pkl', 'wb'))
-    except ValueError:
-        print(f'{cell_name} data dump failed')
+        try:
+            data = from_networkx(final_graph)
+            data.x = data.x.view(-1, 1)
+            pickle.dump(data, open(f'{dir_}/{cell_name}.pkl', 'wb'))
+            print(f'Saved to {dir_}/{cell_name}.pkl')
+        except ValueError:
+            print(f'{cell_name} data dump failed')
