@@ -46,8 +46,8 @@ for ch in chrom_:
             model.train()
             optimizer.zero_grad()
             embeddings = model.forward(graph_data)
-            # loss = torch.mean((embeddings - graph_data.x) ** 2)
-            loss = torch.var(embeddings)
+            loss = torch.mean((embeddings - graph_data.x) ** 2)
+            # loss = torch.var(embeddings)
             total_loss += loss.item()
             loss.backward()
             optimizer.step()
@@ -56,5 +56,5 @@ for ch in chrom_:
 
         print(f'Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
         if epoch % 100 == 0 and epoch != 0:
-            torch.save(model, f'{config_["parent_dir"]}/{ch}_deep_model_{epoch}.pt')
+            torch.save(model, f'{config_["parent_dir"]}/{ch}_diff_loss_deep_model_{epoch}.pt')
             print(f'{ch} {epoch} saved')

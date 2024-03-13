@@ -1,15 +1,16 @@
 import datetime
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import umap
 from sklearn.cluster import KMeans
 
 from config import load_graph_data, config_
+from matplotlib.lines import Line2D
 
 # true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 chrom_ = [
     'chr1',
@@ -26,6 +27,7 @@ for ch in chrom_:
     config_['graph_dir'] = dir_
     print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_deep_model_1000.pt')
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = torch.load(f'{config_["parent_dir"]}/{ch}_deep_model_1000.pt')
     model.eval()
 
@@ -37,11 +39,11 @@ for ch in chrom_:
     with torch.no_grad():
         for key, value in graph_list.items():
             graph_data = value.to(device)
-            #FOR GCN
+            # FOR GCN
             node_embeddings = model(graph_data)  # Get the embedding for the graph
             graph_embedding = node_embeddings.sum(dim=0)
             ###################
-            #FOR GVAE
+            # FOR GVAE
             # x, edge_index = graph_data.x, graph_data.edge_index
             # recon_graph, mu, logstd = model(x, edge_index)
             # graph_embedding = mu.sum(dim=0)
@@ -68,11 +70,23 @@ for ch in chrom_:
             clustered_names[cluster] = [name]
 
     print(clustered_names)
-    plt.figure(figsize=(12, 12))
-    scatter = plt.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=5)
-    plt.colorbar(scatter)
-    plt.title('Graph Embeddings clustered with UMAP')
-    plt.xlabel('UMAP 1')
-    plt.ylabel('UMAP 2')
-    plt.savefig(f'{ch}_plot.png')
-    print('Plotting done')
+
+    fig, ax = plt.subplots(figsize=(12, 12))
+    scatter = ax.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=50, alpha=0.6, label='Clusters')  # Use ax.scatter instead of plt.scatter
+    ax.set_title('Graph Embeddings clustered with UMAP and K-Means', fontsize=18)
+    ax.set_xlabel('UMAP Dimension 1', fontsize=14)
+    ax.set_ylabel('UMAP Dimension 2', fontsize=14)
+
+    # Adjust colorbar size
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.5, fraction=0.046, pad=0.04, label='Cluster ID')  # Adjust fraction and pad to control the colorbar size and spacing
+
+    # Create and position legend
+    unique_labels = np.unique(predicted_labels)
+    colors = [scatter.cmap(scatter.norm(label)) for label in unique_labels]
+    custom_legends = [Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=10, alpha=0.6) for color in colors]
+    ax.legend(custom_legends, [f'Cluster {label}' for label in unique_labels], title='Legend', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    ax.grid(True)
+    fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
+    fig.savefig(f'{ch}_plot.png', dpi=300)  # Save the plot with high resolution
+    print('Enhanced plotting with legend and smaller colorbar done')
