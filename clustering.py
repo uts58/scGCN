@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import umap
+from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
 
 from config import load_graph_data, config_
-from matplotlib.lines import Line2D
 
 # true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
 
@@ -21,17 +21,18 @@ chrom_ = [
     # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
     'chrX'
 ]
+main_cluster_names = {}
 
 for ch in chrom_:
     dir_ = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
     config_['graph_dir'] = dir_
-    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_deep_model_1000.pt')
+    graph_list = load_graph_data()
+
+    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_diff_loss_deep_model_1000.pt')
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = torch.load(f'{config_["parent_dir"]}/{ch}_deep_model_1000.pt')
+    model = torch.load(f'{config_["parent_dir"]}/{ch}_diff_loss_deep_model_1000.pt')
     model.eval()
-
-    graph_list = load_graph_data()
 
     print("Extracting embeddings")
     graph_embeddings = {}
@@ -55,7 +56,7 @@ for ch in chrom_:
     reducer = umap.UMAP()
     embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
-    kmeans = KMeans(n_clusters=7)  # Set the number of clusters
+    kmeans = KMeans(n_clusters=4)  # Set the number of clusters
     predicted_labels = kmeans.fit_predict(embedding_2d)
 
     # print(predicted_labels)
@@ -69,7 +70,8 @@ for ch in chrom_:
         else:
             clustered_names[cluster] = [name]
 
-    print(clustered_names)
+    # print(clustered_names)
+    main_cluster_names[ch] = clustered_names
 
     fig, ax = plt.subplots(figsize=(12, 12))
     scatter = ax.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=50, alpha=0.6, label='Clusters')  # Use ax.scatter instead of plt.scatter
@@ -88,5 +90,7 @@ for ch in chrom_:
 
     ax.grid(True)
     fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
-    fig.savefig(f'{ch}_plot.png', dpi=300)  # Save the plot with high resolution
+    fig.savefig(f'{ch}_mean_diff_loss_plot.png', dpi=300)  # Save the plot with high resolution
     print('Enhanced plotting with legend and smaller colorbar done')
+
+print(main_cluster_names)
