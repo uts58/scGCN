@@ -10,7 +10,7 @@ config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/brain/",
-    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/',
+    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_with_common_graph/',
     'chrom_list': [
         'chr1',
         'chr2', 'chr3', 'chr4', 'chr5',
