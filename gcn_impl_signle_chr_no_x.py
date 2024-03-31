@@ -42,7 +42,7 @@ for ch in chrom_:
                 model.train()
                 optimizer.zero_grad()
                 embeddings = model(graph_data)  # Using the model as a callable is preferred
-                loss = torch.mean((embeddings - graph_data.y) ** 2)  # Assuming graph_data.y or similar exists
+                loss = torch.var(embeddings)
                 total_loss += loss.item()
                 loss.backward()
                 optimizer.step()

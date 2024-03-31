@@ -28,7 +28,7 @@ for ch in chrom_:
     config_['graph_dir'] = dir_
     graph_list = load_graph_data()
 
-    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_diff_loss_deep_model_1000.pt')
+    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_diff_loss_deep_model_no_features_1000.pt')
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = torch.load(f'{config_["parent_dir"]}/{ch}_diff_loss_deep_model_1000.pt')
@@ -56,7 +56,7 @@ for ch in chrom_:
     reducer = umap.UMAP()
     embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
-    kmeans = KMeans(n_clusters=4)  # Set the number of clusters
+    kmeans = KMeans(n_clusters=7)  # Set the number of clusters
     predicted_labels = kmeans.fit_predict(embedding_2d)
 
     # print(predicted_labels)
@@ -90,7 +90,7 @@ for ch in chrom_:
 
     ax.grid(True)
     fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
-    fig.savefig(f'{ch}_mean_diff_loss_plot.png', dpi=300)  # Save the plot with high resolution
+    fig.savefig(f'{ch}_no_features.png', dpi=300)  # Save the plot with high resolution
     print('Enhanced plotting with legend and smaller colorbar done')
 
 print(main_cluster_names)
