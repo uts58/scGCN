@@ -1,16 +1,17 @@
-import datetime
-
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
 import umap
 from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
+from clustering_old import calculate_score
 from config import load_graph_data, config_
 
-# true_cluster_dict = pd.read_csv(config_['labels']).set_index('cell_name').to_dict()['cell_type']
-
+df_temp = pd.read_csv(config_['labels'])
+cell_type_dict = dict(zip(df_temp['cell_name'], df_temp['cell_type']))
 
 chrom_ = [
     'chr1',
@@ -22,16 +23,24 @@ chrom_ = [
     'chrX'
 ]
 main_cluster_names = {}
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 for ch in chrom_:
     dir_ = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_without_common_graph_single_chr_with_x_torch_var/{ch}_deep_model_1000.pt"
     config_['graph_dir'] = dir_
     graph_list = load_graph_data()
 
-    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_diff_loss_deep_model_no_features_1000.pt')
+    for items in graph_list.copy():
+        if items not in cell_type_dict:
+            graph_list.pop(items)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = torch.load(f'{config_["parent_dir"]}/{ch}_diff_loss_deep_model_1000.pt')
+    print("=======================================================================")
+    print(f"============================={ch}=====================================")
+    print(f'Working on {config_["graph_dir"]}')
+    print(f"model: {model_dir}")
+
+    model = torch.load(model_dir)
     model.eval()
 
     print("Extracting embeddings")
@@ -58,10 +67,6 @@ for ch in chrom_:
 
     kmeans = KMeans(n_clusters=7)  # Set the number of clusters
     predicted_labels = kmeans.fit_predict(embedding_2d)
-
-    # print(predicted_labels)
-    # print('=================================')
-    # print([i for i in graph_embeddings.keys()])
 
     clustered_names = {}
     for cluster, name in zip(predicted_labels, graph_embeddings.keys()):
@@ -92,5 +97,15 @@ for ch in chrom_:
     fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
     fig.savefig(f'{ch}_no_features.png', dpi=300)  # Save the plot with high resolution
     print('Enhanced plotting with legend and smaller colorbar done')
+
+    labels_pred = list(predicted_labels)
+    labels_true = [cell_type_dict[cell_name] for cell_name in graph_list.keys()]
+
+    calculate_score(labels_true, labels_pred)
+    silhouette_avg = silhouette_score(embedding_2d, predicted_labels)
+    print(f'Silhouette Score for: {silhouette_avg}')
+
+    print("====================================================================")
+    print("====================================================================")
 
 print(main_cluster_names)

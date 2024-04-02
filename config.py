@@ -4,6 +4,7 @@ import pickle
 from collections import OrderedDict
 
 import pandas as pd
+from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_score, completeness_score, fowlkes_mallows_score, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score, rand_score
 from torch_geometric.data import Batch
 
 config_ = {
@@ -119,3 +120,31 @@ def chunk_graphs(graph_list, batch_size):
         yield batch
 
 
+def calculate_score(labels_true_, labels_pred_):
+    print("===========================================")
+    print(labels_true_)
+    print("===========================================")
+    print(labels_pred_)
+    print("===========================================")
+
+    # Calculate supervised metrics
+    adjusted_rand = adjusted_rand_score(labels_true_, labels_pred_)
+    adjusted_mutual_info = adjusted_mutual_info_score(labels_true_, labels_pred_)
+    completeness = completeness_score(labels_true_, labels_pred_)
+    fowlkes_mallows = fowlkes_mallows_score(labels_true_, labels_pred_)
+    homogeneity = homogeneity_score(labels_true_, labels_pred_)
+    mutual_info = mutual_info_score(labels_true_, labels_pred_)
+    normalized_mutual_info = normalized_mutual_info_score(labels_true_, labels_pred_)
+    v_measure = v_measure_score(labels_true_, labels_pred_)
+    rand = rand_score(labels_true_, labels_pred_)
+
+    # Print the scores for the current column
+    print(f'  Adjusted Rand Score: {adjusted_rand}')
+    print(f'  Adjusted Mutual Information: {adjusted_mutual_info}')
+    print(f'  Completeness Score: {completeness}')
+    print(f'  Fowlkes-Mallows Score: {fowlkes_mallows}')
+    print(f'  Homogeneity Score: {homogeneity}')
+    print(f'  Mutual Info Score: {mutual_info}')
+    print(f'  Normalized Mutual Information: {normalized_mutual_info}')
+    print(f'  V-Measure: {v_measure}')
+    print(f'  Rand Score: {rand}\n')

@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import torch
 
@@ -13,9 +14,11 @@ LEARNING_RATE = 0.001
 ##########################################################
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+config_['graph_dir'] = '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/'
 
 print(f'Graph dir: {config_["graph_dir"]}')
 graph_list = list(load_graph_data().values())
+random.shuffle(graph_list)
 
 if graph_list:
     num_nodes = graph_list[0].num_nodes  # This assumes all graphs have the same number of nodes
@@ -41,5 +44,5 @@ if graph_list:
 
         print(f'{datetime.datetime.now()}: Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
         if epoch % 1000 == 0 and epoch != 0:
-            torch.save(model, f'{config_["parent_dir"]}/deep_model_no_features_with_common_graph_{epoch}.pt')
+            torch.save(model, f'{config_["parent_dir"]}/deep_model_no_features_without_common_graph_{epoch}.pt')
             print(f'{epoch} saved')
