@@ -5,63 +5,33 @@ import torch
 import umap
 from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics.cluster import silhouette_score
 
-from clustering_old import calculate_score
-from config import load_graph_data, config_
+from config import load_graph_data, config_, calculate_score
 
 df_temp = pd.read_csv(config_['labels'])
 cell_type_dict = dict(zip(df_temp['cell_name'], df_temp['cell_type']))
 
-chrom_ = [
-    'chr1',
-    'chr2', 'chr3', 'chr4', 'chr5',
-    'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-    'chr16', 'chr17', 'chr18', 'chr19',
-    # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-    'chrX'
-]
-main_cluster_names = {}
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = torch.load("/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_with_common_graph_deep_model_1000.pt")
+model.eval()  # Set the model to evaluation mode
 
-for ch in chrom_:
-    dir_ = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_without_common_graph_single_chr_with_x_torch_var/{ch}_deep_model_1000.pt"
-    config_['graph_dir'] = dir_
-    graph_list = load_graph_data()
+config_['graph_dir'] = "/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_with_common_graph/"
 
-    for items in graph_list.copy():
-        if items not in cell_type_dict:
-            graph_list.pop(items)
+graph_list = load_graph_data()
+for items in graph_list.copy():
+    if items not in cell_type_dict:
+        graph_list.pop(items)
+graph_embeddings = {}
 
-    print("=======================================================================")
-    print(f"============================={ch}=====================================")
-    print(f'Working on {config_["graph_dir"]}')
-    print(f"model: {model_dir}")
+with torch.no_grad():
+    for key, value in graph_list.items():
+        graph_data = value.to(device)
+        node_embeddings = model(graph_data)  # Get the embedding for the graph
+        graph_embedding = node_embeddings.sum(dim=0)
+        graph_embeddings[key] = graph_embedding.cpu().numpy()
+        graph_data.to('cpu')
 
-    model = torch.load(model_dir)
-    model.eval()
-
-    print("Extracting embeddings")
-    graph_embeddings = {}
-
-    with torch.no_grad():
-        for key, value in graph_list.items():
-            graph_data = value.to(device)
-            # FOR GCN
-            node_embeddings = model(graph_data)  # Get the embedding for the graph
-            graph_embedding = node_embeddings.sum(dim=0)
-            ###################
-            # FOR GVAE
-            # x, edge_index = graph_data.x, graph_data.edge_index
-            # recon_graph, mu, logstd = model(x, edge_index)
-            # graph_embedding = mu.sum(dim=0)
-            ###################
-            graph_embeddings[key] = graph_embedding.cpu().numpy()
-            graph_data.to('cpu')
-
-    # reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2)
     reducer = umap.UMAP()
     embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
@@ -74,9 +44,6 @@ for ch in chrom_:
             clustered_names[cluster].append(name)
         else:
             clustered_names[cluster] = [name]
-
-    # print(clustered_names)
-    main_cluster_names[ch] = clustered_names
 
     fig, ax = plt.subplots(figsize=(12, 12))
     scatter = ax.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=50, alpha=0.6, label='Clusters')  # Use ax.scatter instead of plt.scatter
@@ -95,7 +62,7 @@ for ch in chrom_:
 
     ax.grid(True)
     fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
-    fig.savefig(f'{ch}_no_features.png', dpi=300)  # Save the plot with high resolution
+    fig.savefig(f'plot.png', dpi=300)  # Save the plot with high resolution
     print('Enhanced plotting with legend and smaller colorbar done')
 
     labels_pred = list(predicted_labels)
@@ -108,4 +75,4 @@ for ch in chrom_:
     print("====================================================================")
     print("====================================================================")
 
-print(main_cluster_names)
+    print(clustered_names)
