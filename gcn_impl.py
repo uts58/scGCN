@@ -1,3 +1,5 @@
+import datetime
+
 import torch
 
 from config import config_, load_graph_data
@@ -35,7 +37,7 @@ for epoch in range(NUM_EPOCHS):
         graph_data = graph_data.to('cpu')
         del graph_data
 
-    print(f'Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
+    print(f'{datetime.datetime.now()}: Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
     if epoch % 1000 == 0 and epoch != 0:
         torch.save(model, f'{config_["parent_dir"]}/brain_with_common_graph_deep_model_{epoch}.pt')
         print(f'{epoch} saved')

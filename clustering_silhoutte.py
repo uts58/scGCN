@@ -1,6 +1,5 @@
 import datetime
-import matplotlib.pyplot as plt
-import numpy as np
+
 import torch
 import umap
 from sklearn.cluster import KMeans
@@ -19,10 +18,11 @@ chrom_ = [
 for ch in chrom_:
     dir_ = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
     config_['graph_dir'] = dir_
-    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {config_["parent_dir"]}/{ch}_deep_model_1000.pt')
+    model_path = f'{config_["parent_dir"]}/{ch}_deep_model_1000.pt'
+    print(f'Working on {config_["graph_dir"]}, {datetime.datetime.now()}, {model_path}')
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = torch.load(f'{config_["parent_dir"]}/{ch}_deep_model_1000.pt')
+    model = torch.load(model_path)
     model.eval()
 
     graph_list = load_graph_data()

@@ -49,7 +49,7 @@ for ch in chrom_:
                 graph_data = graph.to('cpu')
                 del graph_data
 
-            print(f'Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
+            print(f'{datetime.datetime.now()}: Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
             if epoch % 1000 == 0 and epoch != 0:
                 torch.save(model, f'{config_["parent_dir"]}/{ch}_diff_loss_deep_model_no_features_{epoch}.pt')
                 print(f'{ch} {epoch} saved')
