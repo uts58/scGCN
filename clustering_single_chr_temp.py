@@ -1,3 +1,5 @@
+# Hi-C + Methylation lee dataset from higashi
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -16,17 +18,17 @@ chrom_ = [
     'chr1',
     'chr2', 'chr3', 'chr4', 'chr5',
     'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-    'chr16', 'chr17', 'chr18', 'chr19',
-    # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-    'chrX'
+    # 'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
+    # 'chr16', 'chr17', 'chr18', 'chr19',
+    # # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
+    # 'chrX'
 ]
 main_cluster_names = {}
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 for ch in chrom_:
-    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_without_common_graph_single_chr_with_x_torch_var/{ch}_deep_model_1000.pt"
+    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/embroy_without_common_graph/_{ch}'
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/{ch}_embroy_no_features_1000.pt"
     config_['graph_dir'] = graph_dir
     graph_list = load_graph_data()
 
@@ -64,7 +66,7 @@ for ch in chrom_:
     reducer = umap.UMAP()
     embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
-    for x in range(7, 15):
+    for x in range(21, 30):
         print(f"============================={x}=====================================")
         kmeans = KMeans(n_clusters=x)  # Set the number of clusters
         predicted_labels = kmeans.fit_predict(embedding_2d)

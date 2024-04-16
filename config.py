@@ -27,7 +27,7 @@ config_ = {
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
-    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels_brain.csv",
+    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels_embroy.csv",
     'resolution': 50000
 }
 
