@@ -4,14 +4,15 @@ import pickle
 from collections import OrderedDict
 
 import pandas as pd
-from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_score, completeness_score, fowlkes_mallows_score, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score, rand_score
+from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_score, completeness_score, \
+    fowlkes_mallows_score, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score, \
+    rand_score
 from torch_geometric.data import Batch
 
 config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/brain/",
-    'graph_dir': '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_with_common_graph/',
     'chrom_list': [
         'chr1',
         'chr2', 'chr3', 'chr4', 'chr5',
@@ -32,14 +33,6 @@ config_ = {
 }
 
 resolution = config_['resolution']
-
-
-def create_directory(directory_list: list):
-    for directory_name in directory_list:
-        os.makedirs(directory_name, exist_ok=True)
-
-
-create_directory([config_['pairs_data_dir'], config_['graph_dir']])
 
 
 def create_chr_gene_mapping() -> dict:
@@ -99,10 +92,11 @@ def get_data_files():
     return cell_vs_files
 
 
-def load_graph_data() -> dict:
+def load_graph_data(dir_) -> dict:
     graph_dict = OrderedDict()
-    print(f'{config_["graph_dir"]}/*.pkl')
-    for files in glob.glob(f'{config_["graph_dir"]}/*.pkl'):
+    dir_ = f'{dir_}/*.pkl'
+    print(dir_)
+    for files in glob.glob(dir_):
         graph_data = pickle.load(open(files, 'rb'))
         graph_data.x, graph_data.edge_index = graph_data.x.float(), graph_data.edge_index.long()
         name = files.split('/')[-1].replace('.pkl', '')
