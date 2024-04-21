@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import torch
 
@@ -19,18 +20,21 @@ model = ModelDeep(num_node_features=NUM_NODE_FEATURES, embedding_size=EMBEDDING_
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-print(f'Graph dir: {config_["graph_dir"]}')
-graph_list = list(load_graph_data().values())
+graph_dir = '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/embroy_without_common_graph/'
+
+print(f'Graph dir: {graph_dir}')
+graph_list = list(load_graph_data(graph_dir).values())
 
 for epoch in range(NUM_EPOCHS):
     total_loss = 0
+    random.shuffle(graph_list)
+
     for graph in graph_list:
         graph_data = graph.to(device)
         model.train()
         optimizer.zero_grad()
         embeddings = model.forward(graph_data)
-        loss = torch.mean((embeddings - graph_data.x) ** 2)
-        # loss = torch.var(embeddings)
+        loss = torch.var(embeddings)
         total_loss += loss.item()
         loss.backward()
         optimizer.step()
@@ -39,5 +43,5 @@ for epoch in range(NUM_EPOCHS):
 
     print(f'{datetime.datetime.now()}: Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
     if epoch % 1000 == 0 and epoch != 0:
-        torch.save(model, f'{config_["parent_dir"]}/brain_with_common_graph_deep_model_{epoch}.pt')
+        torch.save(model, f'{config_["parent_dir"]}/embroy_all_chr_{epoch}.pt')
         print(f'{epoch} saved')

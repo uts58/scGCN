@@ -14,11 +14,11 @@ LEARNING_RATE = 0.001
 ##########################################################
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-config_['graph_dir'] = '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/'
+graph_dir = '/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/embroy_without_common_graph/'
 
-print(f'Graph dir: {config_["graph_dir"]}')
-graph_list = list(load_graph_data().values())
-random.shuffle(graph_list)
+print(f'Graph dir: {graph_dir}')
+graph_list = list(load_graph_data(graph_dir).values())
+
 
 if graph_list:
     num_nodes = graph_list[0].num_nodes  # This assumes all graphs have the same number of nodes
@@ -26,9 +26,9 @@ if graph_list:
     model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    print(f'Graph dir: {config_["graph_dir"]}')
-
     for epoch in range(NUM_EPOCHS):
+        random.shuffle(graph_list)
+
         total_loss = 0
         for graph in graph_list:
             graph_data = graph.to(device)
@@ -44,5 +44,5 @@ if graph_list:
 
         print(f'{datetime.datetime.now()}: Parent Epoch {epoch}, Average Loss: {total_loss / len(graph_list)}')
         if epoch % 1000 == 0 and epoch != 0:
-            torch.save(model, f'{config_["parent_dir"]}/deep_model_no_features_without_common_graph_{epoch}.pt')
+            torch.save(model, f'{config_["parent_dir"]}/embroy_all_chr_no_x_{epoch}.pt')
             print(f'{epoch} saved')
