@@ -9,28 +9,30 @@ from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-from config import load_graph_data, config_, calculate_score
+from config import load_graph_data, calculate_score
 
-df_temp = pd.read_csv(config_['labels'])
+label_dir = "/mmfs1/scratch/utsha.saha/mouse_data/data/labels_brain.csv"
+df_temp = pd.read_csv(label_dir)
 cell_type_dict = dict(zip(df_temp['cell_name'], df_temp['cell_type']))
 
 chrom_ = [
     'chr1',
     'chr2', 'chr3', 'chr4', 'chr5',
     'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-    # 'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-    # 'chr16', 'chr17', 'chr18', 'chr19',
-    # # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-    # 'chrX'
+    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
+    'chr16', 'chr17', 'chr18', 'chr19',
+    # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
+    'chrX'
 ]
 main_cluster_names = {}
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+all_scores = {}
 
 for ch in chrom_:
-    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/embroy_without_common_graph/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/{ch}_embroy_no_features_1000.pt"
-    config_['graph_dir'] = graph_dir
-    graph_list = load_graph_data()
+    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/bain_hic_rna_single_chr/{ch}_deep_model_1000.pt"
+    graph_list = load_graph_data(graph_dir)
 
     for items in graph_list.copy():
         if items not in cell_type_dict:
@@ -38,10 +40,10 @@ for ch in chrom_:
 
     print("=======================================================================")
     print(f"============================={ch}=====================================")
-    print(f'Working on {config_["graph_dir"]}')
+    print(f'Working on {graph_dir}')
     print(f"model: {model_dir}")
 
-    model = torch.load(model_dir)
+    model = torch.load(model_dir, map_location='cuda:0')
     model.eval()
 
     print("Extracting embeddings")
@@ -61,13 +63,16 @@ for ch in chrom_:
             ###################
             graph_embeddings[key] = graph_embedding.cpu().numpy()
             graph_data.to('cpu')
+            del graph_data
 
-    # reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=2)
     reducer = umap.UMAP()
     embedding_2d = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
 
-    for x in range(21, 30):
+    for x in range(7, 14):
         print(f"============================={x}=====================================")
+        plot_title_name = f'Brain with HiC and RNA for {ch}, {x} clusters '
+        plot_file_name = f'plots/brain_{ch}_{x}_hic_rna.png'
+
         kmeans = KMeans(n_clusters=x)  # Set the number of clusters
         predicted_labels = kmeans.fit_predict(embedding_2d)
 
@@ -83,12 +88,12 @@ for ch in chrom_:
 
         fig, ax = plt.subplots(figsize=(12, 12))
         scatter = ax.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=50, alpha=0.6, label='Clusters')  # Use ax.scatter instead of plt.scatter
-        ax.set_title('Graph Embeddings clustered with UMAP and K-Means', fontsize=18)
-        ax.set_xlabel('UMAP Dimension 1', fontsize=14)
-        ax.set_ylabel('UMAP Dimension 2', fontsize=14)
+        ax.set_title(plot_title_name, fontsize=16)
+        ax.set_xlabel('UMAP Dimension 1', fontsize=13)
+        ax.set_ylabel('UMAP Dimension 2', fontsize=13)
 
         # Adjust colorbar size
-        cbar = fig.colorbar(scatter, ax=ax, shrink=0.5, fraction=0.046, pad=0.04, label='Cluster ID')  # Adjust fraction and pad to control the colorbar size and spacing
+        cbar = fig.colorbar(scatter, ax=ax, shrink=0.4, fraction=0.046, pad=0.04, label='Cluster ID')  # Adjust fraction and pad to control the colorbar size and spacing
 
         # Create and position legend
         unique_labels = np.unique(predicted_labels)
@@ -98,17 +103,19 @@ for ch in chrom_:
 
         ax.grid(True)
         fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
-        fig.savefig(f'{ch}_{x}_with_features.png', dpi=300)  # Save the plot with high resolution
+        fig.savefig(plot_file_name, dpi=300)  # Save the plot with high resolution
         print('Enhanced plotting with legend and smaller colorbar done')
 
         labels_pred = list(predicted_labels)
         labels_true = [cell_type_dict[cell_name] for cell_name in graph_list.keys()]
 
-        calculate_score(labels_true, labels_pred)
+        scores = calculate_score(labels_true, labels_pred)
         silhouette_avg = silhouette_score(embedding_2d, predicted_labels)
+        scores.update({"silhouette_avg": silhouette_avg})
         print(f'Silhouette Score for: {silhouette_avg}')
+        all_scores[f'{ch}_{x}'] = scores
 
         print("====================================================================")
     print("====================================================================")
 
-# print(main_cluster_names)
+print(all_scores)

@@ -1,5 +1,4 @@
 import glob
-import os
 import pickle
 from collections import OrderedDict
 
@@ -28,7 +27,6 @@ config_ = {
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
-    'labels': "/mmfs1/scratch/utsha.saha/mouse_data/data/labels_embroy.csv",
     'resolution': 50000
 }
 
@@ -116,9 +114,9 @@ def chunk_graphs(graph_list, batch_size):
 
 def calculate_score(labels_true_, labels_pred_):
     print("===========================================")
-    print(labels_true_)
+    # print(labels_true_)
     print("===========================================")
-    print(labels_pred_)
+    # print(labels_pred_)
     print("===========================================")
 
     # Calculate supervised metrics
@@ -142,3 +140,15 @@ def calculate_score(labels_true_, labels_pred_):
     print(f'  Normalized Mutual Information: {normalized_mutual_info}')
     print(f'  V-Measure: {v_measure}')
     print(f'  Rand Score: {rand}\n')
+
+    return {
+        "adjusted_rand": adjusted_rand,
+        "adjusted_mutual_info": adjusted_mutual_info,
+        "completeness": completeness,
+        "fowlkes_mallows": fowlkes_mallows,
+        "homogeneity": homogeneity,
+        "mutual_info": mutual_info,
+        "normalized_mutual_info": normalized_mutual_info,
+        "v_measure": v_measure,
+        "rand": rand
+    }
