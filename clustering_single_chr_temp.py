@@ -31,7 +31,7 @@ all_scores = {}
 
 for ch in chrom_:
     graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/bain_hic_rna_single_chr/{ch}_deep_model_1000.pt"
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_hic_single_chr/{ch}_deep_model_no_features_1000.pt"
     graph_list = load_graph_data(graph_dir)
 
     for items in graph_list.copy():
@@ -70,8 +70,8 @@ for ch in chrom_:
 
     for x in range(7, 14):
         print(f"============================={x}=====================================")
-        plot_title_name = f'Brain with HiC and RNA for {ch}, {x} clusters '
-        plot_file_name = f'plots/brain_{ch}_{x}_hic_rna.png'
+        plot_title_name = f'Brain with HiC for {ch}, {x} clusters '
+        plot_file_name = f'plots/brain_{ch}_{x}_hic.png'
 
         kmeans = KMeans(n_clusters=x)  # Set the number of clusters
         predicted_labels = kmeans.fit_predict(embedding_2d)
