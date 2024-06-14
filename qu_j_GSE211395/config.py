@@ -3,18 +3,13 @@ import pickle
 from collections import OrderedDict
 
 import pandas as pd
-from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_score, completeness_score, \
-    fowlkes_mallows_score, homogeneity_score, mutual_info_score, normalized_mutual_info_score, v_measure_score, \
-    rand_score
-from torch_geometric.data import Batch
 
 config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/",
     'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/hic/",
     'chrom_list': [
-        'chr1',
-        'chr2', 'chr3', 'chr4', 'chr5',
+        'chr1', 'chr2', 'chr3', 'chr4', 'chr5',
         'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
         'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
         'chr16', 'chr17', 'chr18', 'chr19',
@@ -22,12 +17,11 @@ config_ = {
         'chrX'
     ],
     'rna_umicount_list': [
-        # "/mmfs1/scratch/utsha.saha/mouse_data/data/rna/GSE223917_HiRES_brain.rna.umicount.tsv",
-        # "/mmfs1/scratch/utsha.saha/mouse_data/data/rna/GSE223917_HiRES_emb.rna.umicount.tsv",
         "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/scCARE-seq_RNA_raw_gene_counts.txt"
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
+    'mouse_chr_sizes': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/mouse_chr_size.chr",
     'resolution': 50000
 }
 
@@ -35,60 +29,64 @@ resolution = config_['resolution']
 
 
 def create_chr_gene_mapping() -> dict:
-    def process_csv(file_path):
-        df = pd.read_csv(file_path,
-                         sep='\t',
-                         comment='#',
-                         names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame',
-                                'attribute'])
-        df = df.loc[df['feature'] == 'gene'].copy()
+    def process_csv(file_path: str, pattern: str, col_name: str) -> pd.DataFrame:
+        df = pd.read_csv(
+            file_path,
+            sep='\t',
+            comment='#',
+            names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
+        )
+        df = df[df['feature'] == 'gene'].copy()
+        df[col_name] = df['attribute'].str.extract(pattern)
         return df
 
-    df_chr_gene_mapping_ncbi = process_csv(config_['chr_gene_mapping_ncbi'])
+    def combine_synonyms(row: pd.Series) -> list:
+        if isinstance(row['gene_synonyms'], list):
+            return list(set(row['gene_synonyms'] + [row['gene_name']]))
+        return [row['gene_name']]
 
-    df_chr_gene_mapping_ncbi['gene_name'] = df_chr_gene_mapping_ncbi['attribute'].str.extract(r'gene "([^"]+)"')
-    df_chr_gene_mapping_ncbi['gene_synonyms'] = df_chr_gene_mapping_ncbi['attribute'].str.findall(
-        r'gene_synonym "([^"]+)"')
-    df_chr_gene_mapping_ncbi = df_chr_gene_mapping_ncbi[['gene_name', 'gene_synonyms']]
+    def create_mapping(df: pd.DataFrame) -> dict:
+        mapping = {}
+        for _, row in df.iterrows():
+            for gene_synonym in row['gene_synonyms']:
+                mapping[gene_synonym] = {
+                    'original_gene_name': row['gene_name'],
+                    'seqname': row['seqname'],
+                    'start': row['start'],
+                    'end': row['end'],
+                    'bin': (row['start'] + row['end']) // 2 // resolution
+                }
+        return mapping
 
-    df_chr_gene_mapping = process_csv(config_['chr_gene_mapping_gencode'])
-    df_chr_gene_mapping['gene_name'] = df_chr_gene_mapping['attribute'].str.extract(r'gene_name "([^"]+)"')
-    df_chr_gene_mapping = df_chr_gene_mapping[['seqname', 'start', 'end', 'gene_name']]
-    df_chr_gene_mapping = pd.merge(df_chr_gene_mapping, df_chr_gene_mapping_ncbi, on='gene_name', how='left')
+    df_ncbi = process_csv(config_['chr_gene_mapping_ncbi'], r'gene "([^"]+)"', 'gene_name')
+    df_ncbi['gene_synonyms'] = df_ncbi['attribute'].str.findall(r'gene_synonym "([^"]+)"')
+    df_ncbi = df_ncbi[['gene_name', 'gene_synonyms']]
 
-    def process_row(row):
-        if type(row['gene_synonyms']) == list:
-            x = set(row['gene_synonyms'] + [row['gene_name']])
-            return list(x)
-        else:
-            return [row['gene_name']]
+    df_gencode = process_csv(config_['chr_gene_mapping_gencode'], r'gene_name "([^"]+)"', 'gene_name')
+    df_gencode = df_gencode[['seqname', 'start', 'end', 'gene_name']]
 
-    df_chr_gene_mapping['gene_synonyms'] = df_chr_gene_mapping.apply(process_row, axis=1)
-    df_chr_gene_mapping = df_chr_gene_mapping.loc[df_chr_gene_mapping['seqname'].isin(config_['chrom_list'])].copy()
-
-    data_ = {}
-    for i, rows in df_chr_gene_mapping.iterrows():
-        for items in rows['gene_synonyms']:
-            data_[items] = {
-                'original_gene_name': rows['gene_name'],
-                'seqname': rows['seqname'],
-                'start': rows['start'],
-                'end': rows['end'],
-                'bin': (rows['start'] + rows['end']) // 2 // resolution
-            }
-
-    return data_
+    df_merged = pd.merge(df_gencode, df_ncbi, on='gene_name', how='left')
+    df_merged['gene_synonyms'] = df_merged.apply(combine_synonyms, axis=1)
+    df_filtered = df_merged[df_merged['seqname'].isin(config_['chrom_list'])].copy()
+    return create_mapping(df_filtered)
 
 
-def get_data_files():
+def get_data_files(file_extension: str) -> dict:
+    data_dir = config_['pairs_data_dir']
     cell_vs_files = {}
 
-    for i in glob.glob(f"{config_['pairs_data_dir']}/*.pairs"):
-        file_name = i.replace('.pairs', '')
-        cell_name = file_name.split('_')[-1]
+    for i in glob.glob(f"{data_dir}/*{file_extension}"):
+        file_name = i
+        cell_name = i.split('/')[-1].replace(file_extension, "")
         cell_vs_files[cell_name] = file_name
 
     return cell_vs_files
+
+
+def get_mouse_chr_sizes():
+    chrom_sizes = pd.read_csv(config_['mouse_chr_sizes'], sep='\t')
+    chrom_sizes = chrom_sizes.loc[chrom_sizes['chrom_name'].isin(config_['chrom_list'])].copy()
+    return chrom_sizes
 
 
 def load_graph_data(dir_) -> dict:
@@ -97,59 +95,8 @@ def load_graph_data(dir_) -> dict:
     print(dir_)
     for files in glob.glob(dir_):
         graph_data = pickle.load(open(files, 'rb'))
-        graph_data.x, graph_data.edge_index = graph_data.x.float(), graph_data.edge_index.long()
+        graph_data.edge_index = graph_data.edge_index.long()
         name = files.split('/')[-1].replace('.pkl', '')
         graph_dict[name] = graph_data
 
     return graph_dict
-
-
-def chunk_graphs(graph_list, batch_size):
-    """Chunks a list of graphs into batches of specified size."""
-
-    for i in range(0, len(graph_list), batch_size):
-        batch = graph_list[i:i + batch_size]
-        batch = Batch.from_data_list(batch)  # Combine into a Batch object
-        yield batch
-
-
-def calculate_score(labels_true_, labels_pred_):
-    print("===========================================")
-    # print(labels_true_)
-    print("===========================================")
-    # print(labels_pred_)
-    print("===========================================")
-
-    # Calculate supervised metrics
-    adjusted_rand = adjusted_rand_score(labels_true_, labels_pred_)
-    adjusted_mutual_info = adjusted_mutual_info_score(labels_true_, labels_pred_)
-    completeness = completeness_score(labels_true_, labels_pred_)
-    fowlkes_mallows = fowlkes_mallows_score(labels_true_, labels_pred_)
-    homogeneity = homogeneity_score(labels_true_, labels_pred_)
-    mutual_info = mutual_info_score(labels_true_, labels_pred_)
-    normalized_mutual_info = normalized_mutual_info_score(labels_true_, labels_pred_)
-    v_measure = v_measure_score(labels_true_, labels_pred_)
-    rand = rand_score(labels_true_, labels_pred_)
-
-    # Print the scores for the current column
-    print(f'  Adjusted Rand Score: {adjusted_rand}')
-    print(f'  Adjusted Mutual Information: {adjusted_mutual_info}')
-    print(f'  Completeness Score: {completeness}')
-    print(f'  Fowlkes-Mallows Score: {fowlkes_mallows}')
-    print(f'  Homogeneity Score: {homogeneity}')
-    print(f'  Mutual Info Score: {mutual_info}')
-    print(f'  Normalized Mutual Information: {normalized_mutual_info}')
-    print(f'  V-Measure: {v_measure}')
-    print(f'  Rand Score: {rand}\n')
-
-    return {
-        "adjusted_rand": adjusted_rand,
-        "adjusted_mutual_info": adjusted_mutual_info,
-        "completeness": completeness,
-        "fowlkes_mallows": fowlkes_mallows,
-        "homogeneity": homogeneity,
-        "mutual_info": mutual_info,
-        "normalized_mutual_info": normalized_mutual_info,
-        "v_measure": v_measure,
-        "rand": rand
-    }
