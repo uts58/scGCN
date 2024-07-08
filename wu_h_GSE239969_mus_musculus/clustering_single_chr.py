@@ -23,7 +23,7 @@ all_scores = {}
 
 for ch in chrom_:
     graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/graphs/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/models/{ch}_no_features_100.pt"
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/models/{ch}_100.pt"
     graph_list = load_graph_data(graph_dir)
 
     print("=======================================================================")
@@ -40,6 +40,7 @@ for ch in chrom_:
     with torch.no_grad():
         for key, value in graph_list.items():
             graph_data = value.to(device)
+            graph_data.x = graph_data.x.float()
             node_embeddings = model(graph_data)  # Get the embedding for the graph
             graph_embedding = node_embeddings.sum(dim=0)
             graph_embeddings[key] = graph_embedding.cpu().numpy()
@@ -51,8 +52,8 @@ for ch in chrom_:
 
     for x in range(2, 8):
         print(f"============================={x}=====================================")
-        plot_title_name = f'GSE239969 without RNA, {ch}, {x} clusters '
-        plot_file_name = f'plots/GSE211395_no_rna_{ch}_{x}.png'
+        plot_title_name = f'GSE239969 with RNA, {ch}, {x} clusters '
+        plot_file_name = f'plots/GSE211395_with_rna_{ch}_{x}.png'
 
         kmeans = KMeans(n_clusters=x)  # Set the number of clusters
         predicted_labels = kmeans.fit_predict(embedding_2d)
@@ -88,7 +89,8 @@ for ch in chrom_:
         print('Enhanced plotting with legend and smaller colorbar done')
 
         labels_pred = list(predicted_labels)
-        labels_true = [i.split("_")[1] + i.split("_")[2] for i in graph_list.keys()]
+        labels_true = [i.split("-")[1].split("_")[0] for i in graph_list.keys()]
+        print(labels_true)
 
         scores = calculate_score(labels_true, labels_pred)
         silhouette_avg = silhouette_score(embedding_2d, predicted_labels)

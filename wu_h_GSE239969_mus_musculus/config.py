@@ -9,22 +9,22 @@ from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_sc
 
 config_ = {
     'config_name': 'uts et. al',
-    'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/",
-    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/hic/",
+    'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/",
+    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/hic/",
     'chrom_list': [
         'chr1', 'chr2', 'chr3', 'chr4', 'chr5',
         'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
         'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
         'chr16', 'chr17', 'chr18', 'chr19',
         # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-        'chrX'
+        'chrX', 'chrY'
     ],
     'rna_umicount_list': [
-        "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/scCARE-seq_RNA_raw_gene_counts.txt"
+        "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/moe_rna_gene_counts.tsv"
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
-    'mouse_chr_sizes': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/mouse_chr_size.chr",
+    'mouse_chr_sizes': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/mouse_chr_size.chr",
     'resolution': 50000
 }
 
@@ -32,34 +32,49 @@ resolution = config_['resolution']
 
 
 def create_chr_gene_mapping() -> dict:
-    def process_csv(file_path: str, pattern: str, col_name: str) -> pd.DataFrame:
-        df = pd.read_csv(
-            file_path,
-            sep='\t',
-            comment='#',
-            names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
-        )
-        df = df[df['feature'] == 'gene'].copy()
-        df[col_name] = df['attribute'].str.extract(pattern)
+    def process_csv(file_path):
+        df = pd.read_csv(file_path,
+                         sep='\t',
+                         comment='#',
+                         names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame',
+                                'attribute'])
+        df = df.loc[df['feature'] == 'gene'].copy()
         return df
 
-    def create_mapping(df: pd.DataFrame) -> dict:
-        mapping = {}
-        for _, row in df.iterrows():
-            gene_id = row['gene_id']
-            mapping[gene_id] = {
-                'gene_id': gene_id,
-                'seqname': row['seqname'],
-                'start': row['start'],
-                'end': row['end'],
-                'bin': (row['start'] + row['end']) // 2 // resolution
+    df_chr_gene_mapping_ncbi = process_csv(config_['chr_gene_mapping_ncbi'])
+
+    df_chr_gene_mapping_ncbi['gene_name'] = df_chr_gene_mapping_ncbi['attribute'].str.extract(r'gene "([^"]+)"')
+    df_chr_gene_mapping_ncbi['gene_synonyms'] = df_chr_gene_mapping_ncbi['attribute'].str.findall(
+        r'gene_synonym "([^"]+)"')
+    df_chr_gene_mapping_ncbi = df_chr_gene_mapping_ncbi[['gene_name', 'gene_synonyms']]
+
+    df_chr_gene_mapping = process_csv(config_['chr_gene_mapping_gencode'])
+    df_chr_gene_mapping['gene_name'] = df_chr_gene_mapping['attribute'].str.extract(r'gene_name "([^"]+)"')
+    df_chr_gene_mapping = df_chr_gene_mapping[['seqname', 'start', 'end', 'gene_name']]
+    df_chr_gene_mapping = pd.merge(df_chr_gene_mapping, df_chr_gene_mapping_ncbi, on='gene_name', how='left')
+
+    def process_row(row):
+        if type(row['gene_synonyms']) == list:
+            x = set(row['gene_synonyms'] + [row['gene_name']])
+            return list(x)
+        else:
+            return [row['gene_name']]
+
+    df_chr_gene_mapping['gene_synonyms'] = df_chr_gene_mapping.apply(process_row, axis=1)
+    df_chr_gene_mapping = df_chr_gene_mapping.loc[df_chr_gene_mapping['seqname'].isin(config_['chrom_list'])].copy()
+
+    data_ = {}
+    for i, rows in df_chr_gene_mapping.iterrows():
+        for items in rows['gene_synonyms']:
+            data_[items] = {
+                'original_gene_name': rows['gene_name'],
+                'seqname': rows['seqname'],
+                'start': rows['start'],
+                'end': rows['end'],
+                'bin': (rows['start'] + rows['end']) // 2 // resolution
             }
-        return mapping
 
-    df_gencode = process_csv(config_['chr_gene_mapping_gencode'], r'gene_id "([^"]+?)\.', 'gene_id')
-    df_gencode = df_gencode[['seqname', 'start', 'end', 'gene_id']]
-
-    return create_mapping(df_gencode)
+    return data_
 
 
 def get_data_files(file_extension: str) -> dict:
@@ -86,7 +101,7 @@ def load_graph_data(dir_) -> dict:
     print(dir_)
     for files in glob.glob(dir_):
         graph_data = pickle.load(open(files, 'rb'))
-        # graph_data.edge_index = graph_data.edge_index.long()
+        graph_data.edge_index = graph_data.edge_index.long()
         name = files.split('/')[-1].replace('.pkl', '')
         graph_dict[name] = graph_data
 

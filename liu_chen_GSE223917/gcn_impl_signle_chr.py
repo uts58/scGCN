@@ -26,8 +26,7 @@ def run_thread(no, chrom):
         graph_list = list(load_graph_data(dir_).values())
 
         device = torch.device(f'cuda:{no}' if torch.cuda.is_available() else 'cpu')
-        model = ModelDeep(num_node_features=NUM_NODE_FEATURES, embedding_size=EMBEDDING_SIZE,
-                          hidden_layers=HIDDEN_LAYERS)
+        model = ModelDeep(num_node_features=NUM_NODE_FEATURES, embedding_size=EMBEDDING_SIZE, hidden_layers=HIDDEN_LAYERS)
         model.to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 

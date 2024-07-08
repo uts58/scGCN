@@ -8,7 +8,11 @@ from config import *
 chr_gene_mapping = create_chr_gene_mapping()
 print('Chromosome vs Gene mapping calculated')
 
-df_rna_umicount = [pd.read_csv(rna_file, sep='\t') for rna_file in config_['rna_umicount_list']]
+df_rna_umicount = [
+    pd.read_csv(rna_file, sep='\t').reset_index().rename(columns={'index': 'gene'})
+    for rna_file in config_['rna_umicount_list']
+]
+
 print('umicount files loaded')
 
 cell_vs_files = get_data_files('.allValidPairs.txt')
@@ -29,9 +33,9 @@ def get_gene_umicount(cell_name, chrom_name_list=config_['chrom_list'], df_list=
                 continue
 
             # Filter rows with positive umicounts for relevant genes
-            filtered_df = df[df['GID'].isin(relevant_genes) & (df[cell_name] > 0)]
-
-            for gene_name, umicount in zip(filtered_df['GID'], filtered_df[cell_name]):
+            filtered_df = df[df['gene'].isin(relevant_genes) & (df[cell_name] > 0)]
+            # print(df[df['gene'].isin(relevant_genes)])
+            for gene_name, umicount in zip(filtered_df['gene'], filtered_df[cell_name]):
                 bin = gene_data[gene_name]['bin']
                 to_return[bin] = to_return.get(bin, 0) + umicount
 
@@ -39,6 +43,8 @@ def get_gene_umicount(cell_name, chrom_name_list=config_['chrom_list'], df_list=
 
     return to_return_main
 
+
+# get_gene_umicount('p014.bc_001')
 
 def create_common_graph(cell_name_: str, resolution=resolution):
     nodes_with_attributes = []
@@ -69,10 +75,7 @@ def create_common_graph(cell_name_: str, resolution=resolution):
 
 def construct_final_graph(common_g, file_base_name_: str, resolution=resolution):
     # itertuples structure: Pandas(chr1='chr1', pos1=3017794, chr2='chr1', pos2=4261652)
-    column_names = [
-        'readID', 'chr1', 'pos1', 'Strand_1', 'chr2', 'pos2', 'Strand_2',
-        'Distance', 'HIC_ID_1', 'HIC_ID_2', 'Quality_1', 'Quality_2'
-    ]
+    column_names = ['readID', 'chr1', 'pos1', 'chr2', 'pos2', 'strand1', 'strand2', 'phase0', 'phase1']
 
     df_data = pd.read_csv(file_base_name_,
                           delim_whitespace=True,
@@ -99,8 +102,6 @@ chrs = [
     # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
     'chrX'
 ]
-cell_vs_files = get_data_files('.allValidPairs.txt')
-print('list of pair files generated')
 
 for chr_ in chrs:
     print(f'Starting {chr_}')
@@ -113,20 +114,17 @@ for chr_ in chrs:
     for items in cell_vs_files:
         file_base_name = cell_vs_files[items]
         cell_name = items
+        print(file_base_name, cell_name)
 
-        common_graph = create_common_graph(file_base_name)
-        ass = 0
-        for i in common_graph.nodes:
-            ass += common_graph.nodes[i]['x']
-        print(f'Common_graph: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}, ass: {ass}')
+        common_graph = create_common_graph(cell_name)
+
+        print(f'Common_graph: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}')
 
         final_graph = construct_final_graph(common_graph, file_base_name)
         print(f'Final_graph: {cell_name}: Number of edges:{final_graph.number_of_edges()}, number of nodes:{final_graph.number_of_nodes()}')
-
         try:
             data = from_networkx(final_graph)
             data.x = data.x.view(-1, 1)
-            print(data)
             pickle.dump(data, open(f'{dir_}/{cell_name}.pkl', 'wb'))
             print(f'Saved to {dir_}/{cell_name}.pkl')
         except ValueError:
