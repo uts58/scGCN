@@ -1,4 +1,5 @@
-import matplotlib.pyplot as plt
+
+ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
@@ -7,10 +8,9 @@ from matplotlib.lines import Line2D
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-from clustering import calculate_score
-from config import load_graph_data, config_
+from config import load_graph_data, config_, calculate_score
 
-df_temp = pd.read_csv(config_['labels'])
+df_temp = pd.read_csv("/mmfs1/scratch/utsha.saha/mouse_data/data/labels_brain.csv")
 cell_type_dict = dict(zip(df_temp['cell_name'], df_temp['cell_type']))
 
 chrom_ = [
@@ -26,10 +26,10 @@ main_cluster_names = {}
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 for ch in chrom_:
-    dir_ = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
+    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/graphs/brain_without_common_graph/_{ch}'
     model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/models/brain_without_common_graph_single_chr_with_x_torch_var/{ch}_deep_model_1000.pt"
-    config_['graph_dir'] = dir_
-    graph_list = load_graph_data()
+
+    graph_list = load_graph_data(graph_dir)
 
     for items in graph_list.copy():
         if items not in cell_type_dict:

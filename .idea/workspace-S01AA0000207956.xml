@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b8944c62-d4a6-4894-a740-b47ef330a183" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/liu_chen_GSE223917/clustering_grid_search.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qu_j_GSE211395/clustering_grid_search.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/liu_chen_GSE223917/clustering_single_chr.py" beforeDir="false" afterPath="$PROJECT_DIR$/liu_chen_GSE223917/clustering_single_chr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/liu_chen_GSE223917/clustering_single_chr_temp.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/liu_chen_GSE223917/clustering_temp.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/liu_chen_GSE223917/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/liu_chen_GSE223917/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qu_j_GSE211395/clustering_single_chr.py" beforeDir="false" afterPath="$PROJECT_DIR$/qu_j_GSE211395/clustering_single_chr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qu_j_GSE211395/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/qu_j_GSE211395/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wu_h_GSE239969_mus_musculus/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/wu_h_GSE239969_mus_musculus/config.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Jupyter Notebook" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2fKzhbS6TstbJ3yOPrYrGmFL1cH" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/utsha.saha/OneDrive - North Dakota University System/research/masters_research/codes/qu_j_GSE211395",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\utsha.saha\OneDrive - North Dakota University System\research\masters_research\codes\qu_j_GSE211395" />
+      <recent name="C:\Users\uts58\OneDrive - North Dakota University System\paper\wu_h_GSE239969_mus_musculus" />
+      <recent name="C:\Users\uts58\OneDrive - North Dakota University System\paper" />
+      <recent name="C:\Users\uts58\OneDrive - North Dakota University System\paper\qu_j_GSE211395" />
+      <recent name="C:\Users\uts58\Desktop\paper\qu_j_GSE211395" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\uts58\Desktop\paper\liu_chen_GSE223917" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102" />
+        <option value="bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b8944c62-d4a6-4894-a740-b47ef330a183" name="Changes" comment="" />
+      <created>1713564678740</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1713564678740</updated>
+      <workItem from="1713564681520" duration="597000" />
+      <workItem from="1713657787181" duration="1146000" />
+      <workItem from="1713672225676" duration="624000" />
+      <workItem from="1713751716560" duration="9000" />
+      <workItem from="1713824023501" duration="8125000" />
+      <workItem from="1714103176099" duration="3000" />
+      <workItem from="1714813631105" duration="3408000" />
+      <workItem from="1714833436619" duration="8000" />
+      <workItem from="1714881935512" duration="6000" />
+      <workItem from="1716698844258" duration="7000" />
+      <workItem from="1716858227859" duration="4503000" />
+      <workItem from="1716957273390" duration="12000" />
+      <workItem from="1717121496110" duration="41000" />
+      <workItem from="1717299672325" duration="17000" />
+      <workItem from="1717362503717" duration="4245000" />
+      <workItem from="1717369079549" duration="753000" />
+      <workItem from="1717457362940" duration="3226000" />
+      <workItem from="1717543866467" duration="6000" />
+      <workItem from="1718231977853" duration="86000" />
+      <workItem from="1718232108206" duration="3888000" />
+      <workItem from="1718257270896" duration="702000" />
+      <workItem from="1718314026500" duration="20122000" />
+      <workItem from="1718943611453" duration="8500000" />
+      <workItem from="1719036275170" duration="2637000" />
+      <workItem from="1719260416477" duration="5834000" />
+      <workItem from="1719476696285" duration="117000" />
+      <workItem from="1719592784471" duration="607000" />
+      <workItem from="1719595120148" duration="694000" />
+      <workItem from="1720047280856" duration="596000" />
+      <workItem from="1720376884149" duration="3687000" />
+      <workItem from="1720405509193" duration="4611000" />
+      <workItem from="1720913112921" duration="6000" />
+      <workItem from="1721786693571" duration="328000" />
+      <workItem from="1722488773991" duration="162000" />
+      <workItem from="1722523437811" duration="3713000" />
+      <workItem from="1722540957992" duration="267000" />
+      <workItem from="1724135928722" duration="8000" />
+      <workItem from="1724543726559" duration="41000" />
+      <workItem from="1725069211018" duration="1420000" />
+      <workItem from="1725072232755" duration="921000" />
+      <workItem from="1727897367603" duration="1383000" />
+      <workItem from="1728078407799" duration="1081000" />
+      <workItem from="1728187100901" duration="1355000" />
+      <workItem from="1728577365379" duration="8714000" />
+      <workItem from="1728664277586" duration="6000" />
+      <workItem from="1729217383482" duration="2666000" />
+      <workItem from="1729311980189" duration="3000" />
+      <workItem from="1729477716082" duration="16000" />
+      <workItem from="1729694500560" duration="1614000" />
+      <workItem from="1729787793316" duration="5671000" />
+      <workItem from="1730072657537" duration="21000" />
+      <workItem from="1730238648429" duration="2075000" />
+      <workItem from="1730818391922" duration="2050000" />
+      <workItem from="1730824706083" duration="15000" />
+      <workItem from="1730998823470" duration="3087000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -133,3 +133,21 @@ def calculate_score(labels_true_, labels_pred_):
         "v_measure": v_measure,
         "rand": rand
     }
+
+def plot_graph(embedding_2d, predicted_labels, save_path=None):
+    fig, ax = plt.subplots()
+    scatter = ax.scatter(embedding_2d[:, 0], embedding_2d[:, 1], c=predicted_labels, cmap='Spectral', s=50, alpha=0.6, label='Clusters')  # Use ax.scatter instead of plt.scatter
+    # ax.set_title('Graph Embeddings clustered with UMAP and K-Means', fontsize=18)
+    ax.set_xlabel('UMAP Dimension 1')
+    ax.set_ylabel('UMAP Dimension 2')
+
+    # Adjust colorbar size
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.5, fraction=0.046, pad=0.04, label='Cluster ID')  # Adjust fraction and pad to control the colorbar size and spacing
+
+    # ax.grid(True)
+    fig.tight_layout()  # Adjust layout to accommodate the main plot, legend, and colorbar
+    if save_path:
+        fig.savefig(save_path, dpi=300)  # Save the plot with high resolution
+        print(f'Plot saved at {save_path}')
+    else:
+        plt.show()

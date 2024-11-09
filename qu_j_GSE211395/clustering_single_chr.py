@@ -22,8 +22,8 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 all_scores = {}
 
 for ch in chrom_:
-    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/wu_h_GSE239969_mus_musculus/graphs/_{ch}'
-    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/models/{ch}_no_features_100.pt"
+    graph_dir = f'/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/qu_j_GSE211395_serum_2i/graphs/_{ch}'
+    model_dir = f"/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/qu_j_GSE211395_serum_2i/models/{ch}_no_features_100.pt"
     graph_list = load_graph_data(graph_dir)
 
     print("=======================================================================")
