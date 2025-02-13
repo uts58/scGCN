@@ -3,9 +3,10 @@ from itertools import product
 import pandas as pd
 import torch
 import umap
-from config import load_graph_data, calculate_score
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+
+from config import load_graph_data, calculate_score
 
 # Load cell type dictionary
 df_temp = pd.read_csv("/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/labels_embryo.csv")
@@ -89,16 +90,18 @@ def process_chromosome(ch):
     return best_params
 
 
+all_params = []
 # Run the grid search in parallel across chromosomes using ThreadPoolExecutor
 for ch in chrom_:
     best_params_ = process_chromosome(ch)
+    all_params += best_params_
 
-    # Save results to CSV
-    key_list = [
-        'chr', 'n_neighbors', 'min_dist', 'n_components', 'silhouette_score',
-        'adjusted_rand', 'adjusted_mutual_info', 'completeness', 'fowlkes_mallows',
-        'homogeneity', 'mutual_info', 'normalized_mutual_info', 'v_measure', 'rand'
-    ]
+# Save results to CSV
+key_list = [
+    'chr', 'n_neighbors', 'min_dist', 'n_components', 'silhouette_score',
+    'adjusted_rand', 'adjusted_mutual_info', 'completeness', 'fowlkes_mallows',
+    'homogeneity', 'mutual_info', 'normalized_mutual_info', 'v_measure', 'rand'
+]
 
-    df = pd.DataFrame(best_params_, columns=key_list)
-    df.to_csv(f"embryo_hic_{ch}.csv", index=False)
+df = pd.DataFrame(all_params, columns=key_list)
+df.to_csv(f"embryo_hic.csv", index=False)
