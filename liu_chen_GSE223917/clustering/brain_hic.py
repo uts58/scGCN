@@ -7,7 +7,7 @@ import umap
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-from ..config import load_graph_data, calculate_score
+from config import load_graph_data, calculate_score
 
 # Load cell type dictionary
 df_temp = pd.read_csv("/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/labels_brain.csv")
@@ -26,7 +26,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # UMAP grid search parameters
 n_neighbors_list = [5, 10, 15]
 min_dist_list = [0.1, 0.5, 0.9]
-n_components_list = [2, 16, 32, 64, 128, 256, 512]
+n_components_list = [2, 16, 32, 64, 128, 256]
 n_clusters_for_kmaens = 7
 
 
@@ -62,14 +62,9 @@ def process_chromosome(ch):
 
     # Grid search on UMAP parameters
     for n_neighbors, min_dist, n_components in product(n_neighbors_list, min_dist_list, n_components_list):
-        if n_components == 512:
-            # no embeddings
-            embedding = np.array([graph_embeddings[i] for i in graph_embeddings])
-            kmeans = KMeans(n_init='auto', n_clusters=n_clusters_for_kmaens)
-        else:
-            reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, n_components=n_components)
-            embedding = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
-            kmeans = KMeans(n_init='auto', n_clusters=n_clusters_for_kmaens)
+        reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, n_components=n_components)
+        embedding = reducer.fit_transform([graph_embeddings[i] for i in graph_embeddings])
+        kmeans = KMeans(n_init='auto', n_clusters=n_clusters_for_kmaens)
 
         predicted_labels = kmeans.fit_predict(embedding)
 
@@ -87,7 +82,7 @@ def process_chromosome(ch):
         labels_true = [cell_type_dict[cell_name] for cell_name in graph_list.keys()]
         other_score = calculate_score(labels_true, labels_pred)
         silhouette_avg = silhouette_score(embedding, predicted_labels)
-        print(f'Silhouette Score for n_neighbors={n_neighbors}, min_dist={min_dist}, n_components={n_components}: {silhouette_avg}')
+        print(f'Silhouette Score for n_neighbors={n_neighbors}, min_dist={min_dist}, n_components={n_components}, silhouette_avg={silhouette_avg}')
 
         best_params.append([ch, n_neighbors, min_dist, n_components, silhouette_avg] + list(other_score.values()))
 

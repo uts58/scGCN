@@ -10,21 +10,19 @@ from sklearn.metrics.cluster import adjusted_rand_score, adjusted_mutual_info_sc
 config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/",
-    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/hic/",
+    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/qu_j_GSE211395_serum_2i/hic/",
     'chrom_list': [
-        'chr1', 'chr2', 'chr3', 'chr4', 'chr5',
-        'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-        'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-        'chr16', 'chr17', 'chr18', 'chr19',
+        'chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
+        'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19',
         # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-        'chrX'
+        'chrX', 'chrY'
     ],
     'rna_umicount_list': [
-        "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/scCARE-seq_RNA_raw_gene_counts.txt"
+        "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/qu_j_GSE211395_serum_2i/scCARE-seq_RNA_raw_gene_counts.txt"
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",
-    'mouse_chr_sizes': "/mmfs1/scratch/utsha.saha/mouse_data/data/not_using/qu_j_GSE211395_serum_2i/mouse_chr_size.chr",
+    'mouse_chr_sizes': "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/qu_j_GSE211395_serum_2i/mouse_chr_size.chr",
     'resolution': 50000
 }
 

@@ -11,19 +11,17 @@ from torch_geometric.data import Batch
 config_ = {
     'config_name': 'uts et. al',
     'parent_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/",
-    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/pairs/brain/",
+    'pairs_data_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/pairs/brain/",
+    'graph_dir': "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/graphs/brain/",
     'chrom_list': [
-        'chr1',
-        'chr2', 'chr3', 'chr4', 'chr5',
-        'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-        'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-        'chr16', 'chr17', 'chr18', 'chr19',
+        'chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
+        'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19',
         # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-        'chrX'
+        'chrX', 'chrY'
     ],
     'rna_umicount_list': [
-        "/mmfs1/scratch/utsha.saha/mouse_data/data/rna/GSE223917_HiRES_brain.rna.umicount.tsv",
-        "/mmfs1/scratch/utsha.saha/mouse_data/data/rna/GSE223917_HiRES_emb.rna.umicount.tsv"
+        "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/rna/GSE223917_HiRES_brain.rna.umicount.tsv",
+        "/mmfs1/scratch/utsha.saha/mouse_data/data/datasets/liu_chen_GSE223917_brain_embryo/rna/GSE223917_HiRES_emb.rna.umicount.tsv"
     ],
     'chr_gene_mapping_gencode': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/gencode.vM25.annotation.gtf",
     'chr_gene_mapping_ncbi': "/mmfs1/scratch/utsha.saha/mouse_data/data/chr_gene_mapping/ncbi_grmc38_p6_annotation.gtf",

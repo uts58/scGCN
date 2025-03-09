@@ -1,6 +1,5 @@
-import os
-
 import networkx as nx
+import os
 from torch_geometric.utils import from_networkx
 
 from config import *
@@ -88,19 +87,16 @@ def construct_final_graph(common_g, file_base_name_: str, resolution=resolution)
     return common_g
 
 
-asd = [
-    'chr1',
-    'chr2', 'chr3', 'chr4', 'chr5',
-    'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-    'chr16', 'chr17', 'chr18', 'chr19',
+chrs = [
+    'chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
+    'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19',
     # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-    'chrX'
-]
-for a in asd:
-    print(f'Starting {a}')
-    config_['chrom_list'] = [a]
-    dir_ = f'{config_["graph_dir"]}_{a}'
+    'chrX', 'chrY'
+],
+for chr in chrs:
+    print(f'Starting {chr}')
+    config_['chrom_list'] = [chr]
+    dir_ = f'{config_["graph_dir"]}_{chr}'
     os.makedirs(dir_, exist_ok=True)
     for items in cell_vs_files:
         file_base_name = cell_vs_files[items]
@@ -119,5 +115,5 @@ for a in asd:
             data.x = data.x.view(-1, 1)
             pickle.dump(data, open(f'{dir_}/{cell_name}.pkl', 'wb'))
             print(f'Saved to {dir_}/{cell_name}.pkl')
-        except ValueError:
+        except (ValueError, AttributeError):
             print(f'{cell_name} data dump failed')

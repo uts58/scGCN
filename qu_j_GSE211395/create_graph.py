@@ -1,6 +1,5 @@
-import os
-
 import networkx as nx
+import os
 from torch_geometric.utils import from_networkx
 
 from config import *
@@ -92,13 +91,12 @@ def construct_final_graph(common_g, file_base_name_: str, resolution=resolution)
 
 
 chrs = [
-    'chr1', 'chr2', 'chr3', 'chr4', 'chr5',
-    'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
-    'chr11', 'chr12', 'chr13', 'chr14', 'chr15',
-    'chr16', 'chr17', 'chr18', 'chr19',
+    'chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10',
+    'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19',
     # 'chr20', 'chr21', 'chr22',  #mouse doesn't have these
-    'chrX'
+    'chrX', 'chrY'
 ]
+
 cell_vs_files = get_data_files('.allValidPairs.txt')
 print('list of pair files generated')
 
@@ -115,10 +113,7 @@ for chr_ in chrs:
         cell_name = items
 
         common_graph = create_common_graph(file_base_name)
-        ass = 0
-        for i in common_graph.nodes:
-            ass += common_graph.nodes[i]['x']
-        print(f'Common_graph: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}, ass: {ass}')
+        print(f'Common_graph: Number of edges:{common_graph.number_of_edges()}, number of nodes:{common_graph.number_of_nodes()}')
 
         final_graph = construct_final_graph(common_graph, file_base_name)
         print(f'Final_graph: {cell_name}: Number of edges:{final_graph.number_of_edges()}, number of nodes:{final_graph.number_of_nodes()}')
@@ -129,5 +124,5 @@ for chr_ in chrs:
             print(data)
             pickle.dump(data, open(f'{dir_}/{cell_name}.pkl', 'wb'))
             print(f'Saved to {dir_}/{cell_name}.pkl')
-        except ValueError:
+        except (ValueError, AttributeError):
             print(f'{cell_name} data dump failed')
