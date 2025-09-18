@@ -1,5 +1,5 @@
 # An Exploration of Integrative Analysis of Simultaneously Profiled scHi-C and scRNA-seq Data Using Graph Convolutional Network
-### Code Name: scGCN
+#### Paper: [IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/11129598)
 ---
 
 **scGCN** is a PyTorch Geometric-based framework for integrative analysis of simultaneously profiled single-cell Hi-C (scHi-C) and single-cell RNA-seq (scRNA-seq) data using unsupervised Graph Convolutional Networks (GCNs). It transforms chromatin interactions and gene expression into graphs to uncover relationships between 3D genome architecture and gene expression in single cells.
@@ -63,3 +63,4 @@ These metrics are evaluated across all chromosomes and at different embedding di
 
 ## 🤝 Acknowledgments
 This work was supported by the Center for Computationally Assisted Science and Technology (CCAST) at North Dakota State University, enabled by NSF MRI Award No. 2019077.
+
